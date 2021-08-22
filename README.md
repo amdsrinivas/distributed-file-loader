@@ -67,7 +67,7 @@ CREATE OR REPLACE VIEW PRODUCTS_VIEW AS
 ; -- src/main/resources/sql/CREATE_PRODUCTS_VIEW.sql
 ```
 
--- RUN_LOGGER : table to keep track of the current run number. Used in updates.
+- RUN_LOGGER : table to keep track of the current run number. Used in updates.
 ##### Schema
 ```sql
 CREATE TABLE IF NOT EXISTS RUN_LOGGER(
