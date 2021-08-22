@@ -40,4 +40,17 @@ public class DalService {
             logger.error(e.getMessage());
         }
     }
+
+    public Integer getCurrentRun(){
+        try{
+            String query = "SELECT RUN_NUMBER FROM RUN_LOGGER" ;
+            Integer currentRun = jdbcTemplate.queryForObject(query, Integer.class) ;
+            logger.info("Current Run Number using the DB : " + currentRun);
+            return currentRun ;
+        }
+        catch (Exception e){
+            logger.error(e.getMessage());
+            return null ;
+        }
+    }
 }

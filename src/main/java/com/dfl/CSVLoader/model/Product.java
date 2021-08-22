@@ -7,7 +7,8 @@ public class Product {
     private String name ;
     private String sku ;
     private String description ;
-    private Integer lineNumber ;
+    private Integer batchNumber ;
+    private Integer recordNumber ;
     private String header = "name,sku,description" ;
 
     public Product() {}
@@ -44,15 +45,23 @@ public class Product {
         this.description = description;
     }
 
-    public Integer getLineNumber() {
-        return lineNumber;
+    public Integer getBatchNumber() {
+        return batchNumber;
     }
 
-    public void setLineNumber(Integer lineNumber) {
-        this.lineNumber = lineNumber;
+    public void setBatchNumber(Integer batchNumber) {
+        this.batchNumber = batchNumber;
     }
 
-    public boolean fromString(String line, Integer lineNumber, Scanner fileScanner) {
+    public Integer getRecordNumber() {
+        return recordNumber;
+    }
+
+    public void setRecordNumber(Integer recordNumber) {
+        this.recordNumber = recordNumber;
+    }
+
+    public boolean fromString(String line, Integer batchNumber, Integer recordNumber, Scanner fileScanner) {
         if(line.equals(header)){
             System.out.println("Header ignored : " + line);
             return false;
@@ -78,7 +87,8 @@ public class Product {
         setName(columns[0]);
         setSku(columns[1]);
         setDescription(columns[2]);
-        setLineNumber(lineNumber);
+        setBatchNumber(batchNumber);
+        setRecordNumber(recordNumber);
         return true;
     }
 }

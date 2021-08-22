@@ -24,8 +24,3 @@ fi
 
 echo "docker run -v ${_PAYLOAD_FILE}:/products.csv -v ${_CONFIG_FILE}:/application.properties -v ${_DB_MOUNT}:/data/ -ti -p ${_OPEN_PORT}:`grep -m 1 server.port ${_CONFIG_FILE} | sed 's/server.port=//'`  ${_CONTAINER_TAG} /products.csv"
 docker run -v ${_PAYLOAD_FILE}:/products.csv -v ${_CONFIG_FILE}:/application.properties -v ${_DB_MOUNT}:/data/ -ti -p ${_OPEN_PORT}:`grep -m 1 server.port ${_CONFIG_FILE} | sed 's/server.port=//'`  ${_CONTAINER_TAG} /products.csv
-
-if [ $? == 0 ]; then
-  echo "docker command failed"
-  exit 1
-fi 

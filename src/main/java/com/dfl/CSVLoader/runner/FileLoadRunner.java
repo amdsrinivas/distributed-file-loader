@@ -43,7 +43,7 @@ public class FileLoadRunner implements Runnable {
         try{
             inputStream = new FileInputStream(inputFile) ;
             fileScanner = new Scanner(inputStream) ;
-
+            int batches = 0 ;
             // As long as the file has data, keep reading it.
             while (fileScanner.hasNextLine()){
                 // Start a new batch.
@@ -56,8 +56,8 @@ public class FileLoadRunner implements Runnable {
                     while (fileScanner.hasNextLine() && recordCounter < batchSize){
                         line = fileScanner.nextLine() ;
                         Product product = new Product() ;
-                        // Parse the JSON string to map it to TaskStatus members.
-                        boolean status = product.fromString(line, recordCounter, fileScanner);
+                        // load the record from csv format to Java object.
+                        boolean status = product.fromString(line, batches, recordCounter, fileScanner);
 
                         if(status){
                             batchData.add(product) ;
@@ -69,6 +69,7 @@ public class FileLoadRunner implements Runnable {
                     }
                     // Add the batch to queue.
                     queue.add(batchData) ;
+                    batches++ ;
                     logger.info("Batch added to queue");
                 }
                 // If the queue is busy, wait until a worker picks up a batch from the queue.

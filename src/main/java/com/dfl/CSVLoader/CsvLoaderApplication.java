@@ -40,9 +40,7 @@ public class CsvLoaderApplication {
 
 	private static List<String> createSqlList ;
 
-	private static String pruneSql ;
-
-	private static String loadSql ;
+	private static String startRunSql ;
 
 	private static DalService dalService ;
 
@@ -66,15 +64,9 @@ public class CsvLoaderApplication {
 		CsvLoaderApplication.createSqlList = Arrays.asList(sqlList.split(",")) ;
 	}
 
-	@Value("${prune.sql}")
-	public void setPruneSql(String pruneSql){
-		CsvLoaderApplication.pruneSql = pruneSql ;
-	}
-
-
-	@Value("${load.sql}")
-	public void setLoadSql(String loadSql){
-		CsvLoaderApplication.loadSql = loadSql ;
+	@Value("${startrun.sql}")
+	public void setStartRunSql(String startRunSql){
+		CsvLoaderApplication.startRunSql = startRunSql ;
 	}
 
 
@@ -93,21 +85,27 @@ public class CsvLoaderApplication {
 
 		// Check if the command line argument is provided.
 		if(args.length < 1){
-			logger.error("Invalid arguments. Please provide the path to logfile");
+			logger.error("Invalid arguments. Please provide the path to data file");
 			return;
 		}
-		logger.info("logfile being loaded : " + args[0]);
+		logger.info("data file being loaded : " + args[0]);
 
 		// Start the spring context only if the correct arguments are provided.
 		ConfigurableApplicationContext ctx = SpringApplication.run(CsvLoaderApplication.class, args);
 
-		// Load the SQLs for creating and loading FCT and STG tables.
+		// Load the SQLs for creating and loading FCT table.
 		logger.info("Database setup SQLs configured : " + createSqlList);
-		logger.info("FCT load SQL configured : " + loadSql);
+
+		long startTime = new Date().getTime() ;
+
 		// Setup Database Tables.
 		dalService.runSqlList(createSqlList);
 
-		long startTime = new Date().getTime() ;
+		//Update Run.
+		dalService.runSqlList(Arrays.asList(startRunSql));
+
+		//Get Current Run.
+		Integer currentRun = dalService.getCurrentRun() ;
 
 		// Instantiate a blocking queue which will be shared among the File loader and worker threads.
 		BlockingQueue<List<Product>> queue = new LinkedBlockingDeque<>(maxBatches);
@@ -130,7 +128,7 @@ public class CsvLoaderApplication {
 				// if batches are available in the queue, submit to the thread pool.
 				if(queue.size()>0){
 					logger.info("Submitting batch : " + batchId + " to the thread pool");
-					executorService.submit(new BatchRunner(queue.take(), batchId++, jdbcTemplate)) ;
+					executorService.submit(new BatchRunner(queue.take(), batchId++, jdbcTemplate, currentRun)) ;
 				}
 				// if batches are not available yet, sleep for 2s and check again.
 				else{
@@ -150,19 +148,8 @@ public class CsvLoaderApplication {
 			// Waiting for all submitted tasks to finish and executor is shutdown.
 		}
 		// Mapping is completed.
-		logger.info("Loading all data into STG table completed.");
+		logger.info("Loading all data into FCT table completed.");
 
-		// Update the PRUNE data. Load the data from STG table to PRUNE table.
-		logger.info("Starting PRUNE load");
-		//dalService.runSqlList(Arrays.asList(pruneSql));
-		logger.info("PRUNE load complete");
-		// PRUNE load is completed.
-
-		// Update the FCT data. Load the data from PRUNE table to FCT table.
-		logger.info("Starting FCT load");
-		//dalService.runSqlList(Arrays.asList(loadSql));
-		logger.info("FCT load complete");
-		// FCT load is completed.
 
 		long endTime = new Date().getTime() ;
 
