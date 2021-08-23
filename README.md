@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS PRODUCTS_FCT(
     UPDATED_ON_RUN INTEGER
 ) ; -- src/main/resources/sql/CREATE_PRODUCTS_FCT.sql
 ```
+![PRODUCTS_FCT](images/PRODUCTS_FCT.PNG)
 
 - PRODUCTS_VIEW : View to get the aggregate details of all products by name and count
 ##### Schema
@@ -66,6 +67,7 @@ CREATE OR REPLACE VIEW PRODUCTS_VIEW AS
     FROM PRODUCTS_FCT GROUP BY PRODUCT_NAME
 ; -- src/main/resources/sql/CREATE_PRODUCTS_VIEW.sql
 ```
+![PRODUCTS_VIEW](images/PRODUCTS_VIEW.PNG)
 
 - RUN_LOGGER : table to keep track of the current run number. Used in updates.
 ##### Schema
@@ -78,6 +80,7 @@ INSERT INTO RUN_LOGGER (RUN_NUMBER)
 SELECT 0
 WHERE NOT EXISTS (SELECT * FROM RUN_LOGGER) ; -- src/main/resources/sql/CREATE_PRUN_LOGGER.sql
 ```
+![RUN_LOGGER](images/RUN_LOGGER.PNG)
 
 # Point achieved
 
@@ -93,5 +96,5 @@ WHERE NOT EXISTS (SELECT * FROM RUN_LOGGER) ; -- src/main/resources/sql/CREATE_P
 1. MySQL specific syntax used for loading batches. Would have tried for DB independent syntax.
 2. Would have tuned the number of threads, maximum batches and batch size to optimize the waiting time in few scenarios.
 3. Uses file based DB. Would have tried to use a container based DB server.
-3. More clean code.
+3. Tracking the run using the current datetime instead of a separate table.
 
